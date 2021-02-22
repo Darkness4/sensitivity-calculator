@@ -49,7 +49,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "fr.marc_nguyen.sensitivy"
+        applicationId "fr.marc_nguyen.sensitivity"
         minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
@@ -64,6 +64,10 @@ android {
                         "room.incremental"                            : "true",
                         "room.expandProjection"                       : "true"]
             }
+        }
+
+        lintOptions {
+            disable 'NullSafeMutableLiveData'
         }
     }
 
