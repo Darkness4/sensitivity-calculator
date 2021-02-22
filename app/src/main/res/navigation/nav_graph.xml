@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/measureFragment">
 
+    <fragment
+        android:id="@+id/dataTableFragment"
+        android:name="fr.marc_nguyen.sensitivity.presentation.ui.fragments.DataTableFragment"
+        android:label="DataTableFragment"
+        tools:layout="@layout/fragment_data_table">
+        <argument
+            android:name="game"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/measureFragment"
+        android:name="fr.marc_nguyen.sensitivity.presentation.ui.fragments.MeasureFragment"
+        android:label="MeasureFragment"
+        tools:layout="@layout/fragment_measure" >
+        <action
+            android:id="@+id/action_measureFragment_to_dataTableFragment"
+            app:destination="@id/dataTableFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 </navigation>

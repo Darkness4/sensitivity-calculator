@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
-            type="fr.marc_nguyen.sensitivy.presentation.viewmodels.MeasureViewModel" />
+            type="fr.marc_nguyen.sensitivity.presentation.viewmodels.MeasureViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,7 +17,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_layout_game"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -31,7 +32,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/game"
-                android:inputType="text" />
+                android:inputType="text"
+                android:text="@={viewModel.gameInput}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <View
@@ -45,6 +47,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_layout_sensitivity"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -59,12 +62,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/sensitivity_in_game"
-                android:inputType="textPostalAddress" />
+                android:inputType="numberDecimal"
+                android:text="@={viewModel.sensitivityInput}" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_layout_distance"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -79,13 +84,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/distance_per_360"
-                android:inputType="textPostalAddress" />
+                android:inputType="numberDecimal"
+                android:text="@={viewModel.distancePer360Input}" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_layout_unit"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -101,7 +107,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/unit"
-                android:inputType="text" />
+                android:inputType="none"
+                android:text="@={viewModel.unitInput}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
@@ -112,6 +119,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
+            android:onClick="@{() -> viewModel.add()}"
             android:text="@string/add"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -128,6 +136,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_layout_target_distance"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -142,13 +151,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/target_dist_360"
-                android:inputType="textPostalAddress" />
+                android:inputType="numberDecimal"
+                android:text="@={viewModel.targetPer360Input}" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_layout_target_unit"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -164,7 +174,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/unit"
-                android:inputType="text" />
+                android:inputType="none"
+                android:text="@={viewModel.targetUnitInput}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -176,6 +187,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_input_layout_target_distance"
+            app:showOnSuccess="@{viewModel.computeResult}"
             tools:text="Result: 10.0 ± 2.0" />
 
         <Button
@@ -184,7 +196,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Open data table"
+            android:onClick="@{() -> viewModel.goToDataTableFragment()}"
+            android:text="@string/open_data_table"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_view_result" />
