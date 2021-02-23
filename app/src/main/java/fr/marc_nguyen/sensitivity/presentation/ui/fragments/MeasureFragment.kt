@@ -43,7 +43,11 @@ class MeasureFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         gameAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line)
+            ArrayAdapterNoFilter(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                mutableListOf()
+            )
         binding.editTextGame.setAdapter(gameAdapter)
 
         refreshGameList()
@@ -59,6 +63,7 @@ class MeasureFragment : Fragment() {
         viewModel.addResult.observe(viewLifecycleOwner) {
             it?.fold(
                 {
+                    viewModel.updateResult()
                     refreshGameList()
                 },
                 { e ->

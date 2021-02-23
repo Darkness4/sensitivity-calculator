@@ -8,7 +8,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import fr.marc_nguyen.sensitivity.core.state.doOnFailure
@@ -43,6 +45,14 @@ class DataTableFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         binding.recyclerViewDataTable.adapter = DataTableAdapter(onDelete = viewModel::delete)
+
+        val layoutManager = LinearLayoutManager(context)
+        binding.recyclerViewDataTable.layoutManager = layoutManager
+        val dividerItemDecoration = DividerItemDecoration(
+            context,
+            layoutManager.orientation
+        )
+        binding.recyclerViewDataTable.addItemDecoration(dividerItemDecoration)
         val swipeHandler = object : SwipeToDeleteCallback(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 viewHolder as DataTableAdapter.ViewHolder

@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class DataTableViewModel @AssistedInject constructor(
     private val repository: MeasureRepository,
-    @Assisted game: String
+    @Assisted val game: String
 ) :
     ViewModel() {
     val measures =

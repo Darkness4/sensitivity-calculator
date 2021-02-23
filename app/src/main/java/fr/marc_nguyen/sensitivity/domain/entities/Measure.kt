@@ -50,7 +50,7 @@ fun List<Measure>.meanStdDevOfSensitivityPerDistancePer360(): Pair<Quantity?, Qu
     }
     val mean = sum?.div(this.size.toDouble())
     val variance =
-        if (sumSquared != null && sum != null) (sumSquared - (sum * sum) / this.size.toDouble()) / this.size.toDouble() else null
+        if (sumSquared != null && mean != null) sumSquared / this.size.toDouble() - mean * mean else null
     val stdDev = variance?.sqrt()
     return mean to stdDev
 }

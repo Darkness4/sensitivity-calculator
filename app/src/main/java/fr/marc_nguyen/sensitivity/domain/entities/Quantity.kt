@@ -2,6 +2,7 @@ package fr.marc_nguyen.sensitivity.domain.entities
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlin.math.pow
 
 operator fun Double.times(other: Quantity) =
     Quantity(this * other.value, other.unit, other.unitPower)
@@ -18,11 +19,11 @@ data class Quantity(val value: Double, val unit: MeasureUnit, val unitPower: Int
     )
 
     infix fun convertTo(newUnit: MeasureUnit) =
-        Quantity(value * unit.convertTo(newUnit), newUnit, unitPower)
+        Quantity(value * unit.convertTo(newUnit).pow(unitPower), newUnit, unitPower)
 
     infix fun convertTo(unitSymbol: String): Quantity {
         val newUnit = MeasureUnit.fromSymbol(unitSymbol)
-        return Quantity(value * unit.convertTo(newUnit), newUnit, unitPower)
+        return convertTo(newUnit)
     }
 
     fun sqrt(): Quantity {

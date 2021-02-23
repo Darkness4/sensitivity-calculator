@@ -87,7 +87,7 @@ class MeasureViewModel @Inject constructor(private val repository: MeasureReposi
     private fun toMeasure() = Measure(
         date = Date(),
         game = gameInput.value!!,
-        sensitivityInGame = distancePer360Input.value!!.toDouble(),
+        sensitivityInGame = sensitivityInput.value!!.toDouble(),
         distancePer360 = Quantity(
             distancePer360Input.value!!.toDouble(),
             MeasureUnit.fromSymbol(unitInput.value!!)
