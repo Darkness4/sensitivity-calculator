@@ -49,6 +49,7 @@ class MeasureFragment : Fragment() {
                 mutableListOf()
             )
         binding.editTextGame.setAdapter(gameAdapter)
+        binding.editTextTargetGame.setAdapter(gameAdapter)
 
         refreshGameList()
 
@@ -58,7 +59,6 @@ class MeasureFragment : Fragment() {
             MeasureUnit.symbols
         )
         binding.editTextUnit.setAdapter(unitAdapter)
-        binding.editTextTargetUnit.setAdapter(unitAdapter)
 
         viewModel.addResult.observe(viewLifecycleOwner) {
             it?.fold(
@@ -67,7 +67,7 @@ class MeasureFragment : Fragment() {
                     refreshGameList()
                 },
                 { e ->
-                    Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                     Timber.e(e)
                 }
             )
@@ -75,8 +75,13 @@ class MeasureFragment : Fragment() {
 
         viewModel.computeResult.observe(viewLifecycleOwner) {
             it?.doOnFailure { e ->
-                Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show()
-                Timber.e(e)
+                when (e) {
+                    is NullPointerException -> Timber.i(e)
+                    else -> {
+                        Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
+                        Timber.e(e)
+                    }
+                }
             }
         }
 
@@ -91,16 +96,12 @@ class MeasureFragment : Fragment() {
         viewModel.gameInput.observe(viewLifecycleOwner) {
             it?.let {
                 viewModel.updateResult()
+                viewModel.prefillGameFields(it)
+                binding.buttonAdd.text = if (it.isNotBlank()) "Add to $it" else "Add to \"\""
             }
         }
 
-        viewModel.targetPer360Input.observe(viewLifecycleOwner) {
-            it?.let {
-                viewModel.updateResult()
-            }
-        }
-
-        viewModel.targetUnitInput.observe(viewLifecycleOwner) {
+        viewModel.targetGameInput.observe(viewLifecycleOwner) {
             it?.let {
                 viewModel.updateResult()
             }

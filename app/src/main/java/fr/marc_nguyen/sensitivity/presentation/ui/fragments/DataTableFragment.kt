@@ -65,14 +65,14 @@ class DataTableFragment : Fragment() {
 
         viewModel.measures.observe(viewLifecycleOwner) {
             it?.doOnFailure { e ->
-                Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show()
+                Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                 Timber.e(e)
             }
         }
 
         viewModel.meanStd.observe(viewLifecycleOwner) {
             it?.doOnFailure { e ->
-                Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show()
+                Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                 Timber.e(e)
             }
         }

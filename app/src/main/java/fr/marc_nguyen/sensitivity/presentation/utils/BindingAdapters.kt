@@ -5,12 +5,18 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import fr.marc_nguyen.sensitivity.core.state.State
 import fr.marc_nguyen.sensitivity.core.state.doOnSuccess
+import fr.marc_nguyen.sensitivity.core.state.fold
 import fr.marc_nguyen.sensitivity.domain.entities.Measure
 import fr.marc_nguyen.sensitivity.presentation.ui.adapters.DataTableAdapter
 
 @BindingAdapter("showOnSuccess")
 fun showOnSuccess(view: TextView, state: State<String>?) {
     view.text = state?.getOrNull() ?: ""
+}
+
+@BindingAdapter("show")
+fun show(view: TextView, state: State<String>?) {
+    state?.fold({ view.text = it }, { view.text = it.message })
 }
 
 @BindingAdapter("bind")

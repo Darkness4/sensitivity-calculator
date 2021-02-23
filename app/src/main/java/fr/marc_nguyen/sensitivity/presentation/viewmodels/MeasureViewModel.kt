@@ -10,6 +10,8 @@ import fr.marc_nguyen.sensitivity.core.state.map
 import fr.marc_nguyen.sensitivity.domain.entities.Measure
 import fr.marc_nguyen.sensitivity.domain.entities.MeasureUnit
 import fr.marc_nguyen.sensitivity.domain.entities.Quantity
+import fr.marc_nguyen.sensitivity.domain.entities.meanStdDevOfDistancePer360
+import fr.marc_nguyen.sensitivity.domain.entities.meanStdDevOfSensitivity
 import fr.marc_nguyen.sensitivity.domain.entities.meanStdDevOfSensitivityPerDistancePer360
 import fr.marc_nguyen.sensitivity.domain.repositories.MeasureRepository
 import fr.marc_nguyen.sensitivity.presentation.ui.fragments.DataTableFragmentArgs
@@ -21,14 +23,14 @@ import javax.inject.Inject
 @HiltViewModel
 class MeasureViewModel @Inject constructor(private val repository: MeasureRepository) :
     ViewModel() {
-    val gameInput = MutableLiveData("")
+    val gameInput = MutableLiveData("CS:GO")
     val sensitivityInput = MutableLiveData("")
     val distancePer360Input = MutableLiveData("")
     val unitInput = MutableLiveData("cm")
-    val targetPer360Input = MutableLiveData("")
-    val targetUnitInput = MutableLiveData("cm")
+    val targetGameInput = MutableLiveData("")
+
     val computeResult =
-        MutableLiveData<State<String>>(State.Success("Result: Waiting for input..."))
+        MutableLiveData<State<String>>(State.Success("Sensitivity: Waiting for input..."))
 
     private val _goToDataTableFragment = MutableLiveData<DataTableFragmentArgs?>()
     val goToDataTableFragment: LiveData<DataTableFragmentArgs?>
@@ -46,32 +48,42 @@ class MeasureViewModel @Inject constructor(private val repository: MeasureReposi
     val addResult: LiveData<State<Unit>>
         get() = _addResult
 
+    fun prefillGameFields(game: String) = viewModelScope.launch(Dispatchers.Main) {
+        val measures = repository.findByGame(game)
+        val meanDistancePer360 = measures.meanStdDevOfDistancePer360().first
+        val meanSensitivity = measures.meanStdDevOfSensitivity().first
+        if (meanSensitivity != null && meanDistancePer360 != null) {
+            sensitivityInput.value = meanSensitivity.toString()
+            distancePer360Input.value = meanDistancePer360.value.toString()
+            unitInput.value = meanDistancePer360.unit.symbol
+        }
+    }
+
     fun updateResult() = viewModelScope.launch(Dispatchers.Main) {
-        try {
-            val measures = repository.findByGame(gameInput.value!!)
-            val (mean, stdDev) = measures.meanStdDevOfSensitivityPerDistancePer360()
+        computeResult.value = try {
+            // Fetch
+            val (meanSensitivityPerDistancePer360, stdDevSensitivityPerDistancePer360) = repository.findByGame(
+                gameInput.value!!
+            ).meanStdDevOfSensitivityPerDistancePer360()
+            meanSensitivityPerDistancePer360
+                ?: throw NullPointerException("No game data: Please, save your sensitivity and distance per 360° of your game !")
+            stdDevSensitivityPerDistancePer360 ?: throw UnknownError("Std. Dev. shouldn't be null!")
+            val meanTargetDistance =
+                repository.findByGame(targetGameInput.value!!).meanStdDevOfDistancePer360().first
+                    ?: throw NullPointerException("No target game data")
+
+            // Compute
             val meanSensitivity = Measure.computeNewSensitivity(
-                mean!!,
-                Quantity(
-                    targetPer360Input.value!!.toDouble(),
-                    MeasureUnit.fromSymbol(targetUnitInput.value!!)
-                ),
+                meanSensitivityPerDistancePer360,
+                meanTargetDistance,
             )
             val stdDevSensitivity = Measure.computeNewSensitivity(
-                stdDev!!,
-                Quantity(
-                    targetPer360Input.value!!.toDouble(),
-                    MeasureUnit.fromSymbol(targetUnitInput.value!!)
-                ),
+                stdDevSensitivityPerDistancePer360,
+                meanTargetDistance,
             )
-            computeResult.value =
-                State.Success("Result: %.4f ± %.4f".format(meanSensitivity, stdDevSensitivity))
-        } catch (e: NullPointerException) {
-            computeResult.value = State.Success("Result: No data")
-        } catch (e: NumberFormatException) {
-            computeResult.value = State.Success("Result: No target distance")
+            State.Success("Sensitivity: %.4f ± %.4f".format(meanSensitivity, stdDevSensitivity))
         } catch (e: Exception) {
-            computeResult.value = State.Failure(e)
+            State.Failure(e)
         }
     }
 

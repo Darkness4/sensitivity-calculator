@@ -6,7 +6,7 @@
     <string name="game">Game</string>
     <string name="unit">Unit</string>
     <string name="sensitivity_in_game">Sensitivity In Game</string>
-    <string name="target_dist_360">Target Dist./360°</string>
+    <string name="target_game">Target Game</string>
     <string name="add">Add</string>
     <string name="open_data_table">Open data table</string>
     <string name="sens_dist_360">Sens/Dist/360°</string>
