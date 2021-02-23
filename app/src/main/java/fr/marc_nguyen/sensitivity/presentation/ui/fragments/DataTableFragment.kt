@@ -65,15 +65,22 @@ class DataTableFragment : Fragment() {
 
         viewModel.measures.observe(viewLifecycleOwner) {
             it?.doOnFailure { e ->
-                Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                 Timber.e(e)
+                Toast.makeText(requireActivity(), e.localizedMessage, Toast.LENGTH_LONG).show()
             }
         }
 
-        viewModel.meanStd.observe(viewLifecycleOwner) {
+        viewModel.approximation.observe(viewLifecycleOwner) {
             it?.doOnFailure { e ->
-                Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                 Timber.e(e)
+                Toast.makeText(requireActivity(), e.localizedMessage, Toast.LENGTH_LONG).show()
+            }
+        }
+
+        viewModel.factor.observe(viewLifecycleOwner) {
+            it?.doOnFailure { e ->
+                Timber.e(e)
+                Toast.makeText(requireActivity(), e.localizedMessage, Toast.LENGTH_LONG).show()
             }
         }
 

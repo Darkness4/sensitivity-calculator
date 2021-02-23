@@ -11,7 +11,8 @@ import dagger.assisted.AssistedInject
 import fr.marc_nguyen.sensitivity.core.state.State
 import fr.marc_nguyen.sensitivity.core.state.doOnSuccess
 import fr.marc_nguyen.sensitivity.domain.entities.Measure
-import fr.marc_nguyen.sensitivity.domain.entities.meanStdDevOfSensitivityPerDistancePer360
+import fr.marc_nguyen.sensitivity.domain.entities.meanStdDev
+import fr.marc_nguyen.sensitivity.domain.entities.polyRegression
 import fr.marc_nguyen.sensitivity.domain.repositories.MeasureRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,29 +26,26 @@ class DataTableViewModel @AssistedInject constructor(
         repository.watchByGame(game)
             .asLiveData(viewModelScope.coroutineContext + Dispatchers.Default)
 
-    val meanStd = measures.switchMap {
+    val approximation = measures.switchMap {
         liveData<State<String>>(viewModelScope.coroutineContext + Dispatchers.Default) {
             it.doOnSuccess { measures ->
-                val (mean, stdDev) = measures.meanStdDevOfSensitivityPerDistancePer360()
-                if (mean != null && stdDev != null && mean.unit == stdDev.unit) {
-                    emit(
-                        State.Success(
-                            if (mean.unitPower != 1) "%.4f ± %.4f %s^%d".format(
-                                mean.value,
-                                stdDev.value,
-                                mean.unit.symbol,
-                                mean.unitPower
-                            ) else "%.4f ± %.4f %s".format(
-                                mean.value,
-                                stdDev.value,
-                                mean.unit.symbol
-                            )
-                        )
-                    )
-                } else if (mean != null && stdDev != null) {
-                    emit(State.Failure(Exception("Some error in unit : mean.unit=${mean.unit} stdDev.unit=${stdDev.unit}")))
-                } else {
-                    emit(State.Success("Data is empty"))
+                try {
+                    emit(State.Success(measures.polyRegression().toString()))
+                } catch (e: Exception) {
+                    emit(State.Failure(e))
+                }
+            }
+        }
+    }
+
+    val factor = measures.switchMap {
+        liveData<State<String>>(viewModelScope.coroutineContext + Dispatchers.Default) {
+            it.doOnSuccess { measures ->
+                try {
+                    val (mean, stdDev) = measures.map { it.sensitivityDistanceIn360 }.meanStdDev()
+                    emit(State.Success("%s ± %s".format(mean.toString(), stdDev.toString())))
+                } catch (e: Exception) {
+                    emit(State.Failure(e))
                 }
             }
         }

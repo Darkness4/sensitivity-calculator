@@ -33,18 +33,18 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                    android:id="@+id/edit_text_game"
+                    android:id="@+id/edit_text_source_game"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/game"
-                    android:inputType="text"
-                    android:text="@={viewModel.gameInput}" />
+                    android:hint="@string/source_game"
+                    android:inputType="none"
+                    android:text="@={viewModel.sourceGameInput}" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:background="@color/black"
+                android:background="?attr/colorOnBackground"
                 app:layout_constraintBottom_toTopOf="@+id/text_input_layout_sensitivity"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -66,7 +66,7 @@
                     android:id="@+id/edit_text_sensitivity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/sensitivity_in_game"
+                    android:hint="@string/sensitivity_in_source_game"
                     android:inputType="numberDecimal"
                     android:text="@={viewModel.sensitivityInput}" />
 
@@ -128,49 +128,106 @@
                 android:text="@string/add"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_input_layout_unit" />
+                app:layout_constraintTop_toBottomOf="@+id/text_input_layout_distance" />
 
             <View
+                android:id="@+id/view"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:background="@color/black"
-                app:layout_constraintBottom_toTopOf="@+id/text_input_layout_target_game"
+                android:background="?attr/colorOnBackground"
+                app:layout_constraintBottom_toTopOf="@+id/text_input_layout_target_distance"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/button_add" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout_target_game"
+                android:id="@+id/text_input_layout_target_distance"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toStartOf="@+id/text_input_layout_target_unit"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_add">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_target_distance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/distance_per_360"
+                    android:inputType="numberDecimal"
+                    android:text="@={viewModel.targetDistancePer360Input}" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_input_layout_target_unit"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="32dp"
                 android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/text_input_layout_target_distance"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/button_add">
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/text_input_layout_target_distance"
+                app:layout_constraintTop_toTopOf="@+id/text_input_layout_target_distance">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                    android:id="@+id/edit_text_target_game"
+                    android:id="@+id/edit_text_target_unit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/target_game"
+                    android:hint="@string/unit"
                     android:inputType="none"
-                    android:text="@={viewModel.targetGameInput}" />
-
+                    android:text="@={viewModel.targetUnitInput}" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
-                android:id="@+id/text_view_result"
+                android:id="@+id/text_view_quadratic_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="32dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:layout_marginTop="16dp"
+                android:text="@string/quadratic_regression"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_input_layout_target_game"
-                app:show="@{viewModel.computeResult}"
+                app:layout_constraintTop_toBottomOf="@+id/text_input_layout_target_distance" />
+
+
+            <TextView
+                android:id="@+id/text_view_quadratic_result"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_quadratic_label"
+                app:show="@{viewModel.computeQuadraticResult}"
+                tools:text="Sensitivity: 10.0 ± 2.0" />
+
+            <TextView
+                android:id="@+id/text_view_linear_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/linear_regression"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_quadratic_result" />
+
+            <TextView
+                android:id="@+id/text_view_linear_result"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_linear_label"
+                app:show="@{viewModel.computeLinearResult}"
                 tools:text="Sensitivity: 10.0 ± 2.0" />
 
             <Button
@@ -185,7 +242,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_view_result" />
+                app:layout_constraintTop_toBottomOf="@+id/text_view_linear_result" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

@@ -28,7 +28,9 @@ class MeasureFragment : Fragment() {
     private var _binding: FragmentMeasureBinding? = null
     private val binding: FragmentMeasureBinding
         get() = _binding!!
-    private lateinit var gameAdapter: ArrayAdapter<String>
+    private var _gameAdapter: ArrayAdapter<String>? = null
+    private val gameAdapter: ArrayAdapter<String>
+        get() = _gameAdapter!!
 
     @Inject
     lateinit var repository: MeasureRepository
@@ -42,14 +44,13 @@ class MeasureFragment : Fragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        gameAdapter =
+        _gameAdapter =
             ArrayAdapterNoFilter(
                 requireContext(),
                 android.R.layout.simple_dropdown_item_1line,
                 mutableListOf()
             )
-        binding.editTextGame.setAdapter(gameAdapter)
-        binding.editTextTargetGame.setAdapter(gameAdapter)
+        binding.editTextSourceGame.setAdapter(gameAdapter)
 
         refreshGameList()
 
@@ -59,6 +60,7 @@ class MeasureFragment : Fragment() {
             MeasureUnit.symbols
         )
         binding.editTextUnit.setAdapter(unitAdapter)
+        binding.editTextTargetUnit.setAdapter(unitAdapter)
 
         viewModel.addResult.observe(viewLifecycleOwner) {
             it?.fold(
@@ -67,19 +69,19 @@ class MeasureFragment : Fragment() {
                     refreshGameList()
                 },
                 { e ->
-                    Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                     Timber.e(e)
+                    Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                 }
             )
         }
 
-        viewModel.computeResult.observe(viewLifecycleOwner) {
+        viewModel.computeQuadraticResult.observe(viewLifecycleOwner) {
             it?.doOnFailure { e ->
                 when (e) {
-                    is NullPointerException -> Timber.i(e)
+                    is NullPointerException -> Timber.i(e.toString())
                     else -> {
-                        Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                         Timber.e(e)
+                        Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                     }
                 }
             }
@@ -93,15 +95,20 @@ class MeasureFragment : Fragment() {
             }
         }
 
-        viewModel.gameInput.observe(viewLifecycleOwner) {
+        viewModel.sourceGameInput.observe(viewLifecycleOwner) {
             it?.let {
                 viewModel.updateResult()
-                viewModel.prefillGameFields(it)
                 binding.buttonAdd.text = if (it.isNotBlank()) "Add to $it" else "Add to \"\""
             }
         }
 
-        viewModel.targetGameInput.observe(viewLifecycleOwner) {
+        viewModel.targetUnitInput.observe(viewLifecycleOwner) {
+            it?.let {
+                viewModel.updateResult()
+            }
+        }
+
+        viewModel.targetDistancePer360Input.observe(viewLifecycleOwner) {
             it?.let {
                 viewModel.updateResult()
             }
@@ -119,5 +126,6 @@ class MeasureFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        _gameAdapter = null
     }
 }

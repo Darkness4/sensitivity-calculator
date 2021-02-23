@@ -10,26 +10,29 @@ import fr.marc_nguyen.sensitivity.core.state.map
 import fr.marc_nguyen.sensitivity.domain.entities.Measure
 import fr.marc_nguyen.sensitivity.domain.entities.MeasureUnit
 import fr.marc_nguyen.sensitivity.domain.entities.Quantity
-import fr.marc_nguyen.sensitivity.domain.entities.meanStdDevOfDistancePer360
-import fr.marc_nguyen.sensitivity.domain.entities.meanStdDevOfSensitivity
-import fr.marc_nguyen.sensitivity.domain.entities.meanStdDevOfSensitivityPerDistancePer360
+import fr.marc_nguyen.sensitivity.domain.entities.computeNewSensitivityLinear
+import fr.marc_nguyen.sensitivity.domain.entities.computeNewSensitivityQuadratic
 import fr.marc_nguyen.sensitivity.domain.repositories.MeasureRepository
 import fr.marc_nguyen.sensitivity.presentation.ui.fragments.DataTableFragmentArgs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
 class MeasureViewModel @Inject constructor(private val repository: MeasureRepository) :
     ViewModel() {
-    val gameInput = MutableLiveData("CS:GO")
+    val sourceGameInput = MutableLiveData("CS:GO")
     val sensitivityInput = MutableLiveData("")
     val distancePer360Input = MutableLiveData("")
     val unitInput = MutableLiveData("cm")
-    val targetGameInput = MutableLiveData("")
+    val targetDistancePer360Input = MutableLiveData("")
+    val targetUnitInput = MutableLiveData("cm")
 
-    val computeResult =
+    val computeQuadraticResult =
+        MutableLiveData<State<String>>(State.Success("Sensitivity: Waiting for input..."))
+    val computeLinearResult =
         MutableLiveData<State<String>>(State.Success("Sensitivity: Waiting for input..."))
 
     private val _goToDataTableFragment = MutableLiveData<DataTableFragmentArgs?>()
@@ -37,7 +40,7 @@ class MeasureViewModel @Inject constructor(private val repository: MeasureReposi
         get() = _goToDataTableFragment
 
     fun goToDataTableFragment() {
-        _goToDataTableFragment.value = DataTableFragmentArgs(gameInput.value!!)
+        _goToDataTableFragment.value = DataTableFragmentArgs(sourceGameInput.value!!)
     }
 
     fun goToDataTableFragmentDone() {
@@ -48,40 +51,62 @@ class MeasureViewModel @Inject constructor(private val repository: MeasureReposi
     val addResult: LiveData<State<Unit>>
         get() = _addResult
 
-    fun prefillGameFields(game: String) = viewModelScope.launch(Dispatchers.Main) {
-        val measures = repository.findByGame(game)
-        val meanDistancePer360 = measures.meanStdDevOfDistancePer360().first
-        val meanSensitivity = measures.meanStdDevOfSensitivity().first
-        if (meanSensitivity != null && meanDistancePer360 != null) {
-            sensitivityInput.value = meanSensitivity.toString()
-            distancePer360Input.value = meanDistancePer360.value.toString()
-            unitInput.value = meanDistancePer360.unit.symbol
+    fun updateResult() {
+        computeQuadratic()
+        computeLinear()
+    }
+
+    private fun computeLinear() = viewModelScope.launch(Dispatchers.Main) {
+        computeLinearResult.value = try {
+            // Assert
+            val sourceGame =
+                sourceGameInput.value ?: throw NullPointerException("Source game is null.")
+            if (sourceGame.isEmpty()) throw NullPointerException("Source game is empty.")
+            val targetDistance = targetDistancePer360Input.value
+                ?: throw NullPointerException("Target distance is null.")
+            if (targetDistance.isEmpty()) throw NullPointerException("Target distance is empty.")
+            val targetUnit =
+                targetUnitInput.value ?: throw NullPointerException("Target unit is null.")
+
+            // Fetch
+            val measures = repository.findByGame(sourceGame)
+
+            // Compute
+            val sensitivity = withContext(Dispatchers.Default) {
+                measures.computeNewSensitivityLinear(
+                    Quantity(targetDistance.toDouble(), targetUnit)
+                )
+            }
+
+            State.Success("Sensitivity: %.4f ± %.4f".format(sensitivity.first, sensitivity.second))
+        } catch (e: Exception) {
+            State.Failure(e)
         }
     }
 
-    fun updateResult() = viewModelScope.launch(Dispatchers.Main) {
-        computeResult.value = try {
+    private fun computeQuadratic() = viewModelScope.launch(Dispatchers.Main) {
+        computeQuadraticResult.value = try {
+            // Assert
+            val sourceGame =
+                sourceGameInput.value ?: throw NullPointerException("Source game is null.")
+            if (sourceGame.isEmpty()) throw NullPointerException("Source game is empty.")
+            val targetDistance = targetDistancePer360Input.value
+                ?: throw NullPointerException("Target distance is null.")
+            if (targetDistance.isEmpty()) throw NullPointerException("Target distance is empty.")
+            val targetUnit =
+                targetUnitInput.value ?: throw NullPointerException("Target unit is null.")
+
             // Fetch
-            val (meanSensitivityPerDistancePer360, stdDevSensitivityPerDistancePer360) = repository.findByGame(
-                gameInput.value!!
-            ).meanStdDevOfSensitivityPerDistancePer360()
-            meanSensitivityPerDistancePer360
-                ?: throw NullPointerException("No game data: Please, save your sensitivity and distance per 360° of your game !")
-            stdDevSensitivityPerDistancePer360 ?: throw UnknownError("Std. Dev. shouldn't be null!")
-            val meanTargetDistance =
-                repository.findByGame(targetGameInput.value!!).meanStdDevOfDistancePer360().first
-                    ?: throw NullPointerException("No target game data")
+            val measures = repository.findByGame(sourceGame)
 
             // Compute
-            val meanSensitivity = Measure.computeNewSensitivity(
-                meanSensitivityPerDistancePer360,
-                meanTargetDistance,
-            )
-            val stdDevSensitivity = Measure.computeNewSensitivity(
-                stdDevSensitivityPerDistancePer360,
-                meanTargetDistance,
-            )
-            State.Success("Sensitivity: %.4f ± %.4f".format(meanSensitivity, stdDevSensitivity))
+            val sensitivity = withContext(Dispatchers.Default) {
+                measures.computeNewSensitivityQuadratic(
+                    Quantity(targetDistance.toDouble(), targetUnit)
+                )
+            }
+
+            State.Success("Sensitivity: %.4f".format(sensitivity))
         } catch (e: Exception) {
             State.Failure(e)
         }
@@ -98,7 +123,7 @@ class MeasureViewModel @Inject constructor(private val repository: MeasureReposi
 
     private fun toMeasure() = Measure(
         date = Date(),
-        game = gameInput.value!!,
+        game = sourceGameInput.value!!,
         sensitivityInGame = sensitivityInput.value!!.toDouble(),
         distancePer360 = Quantity(
             distancePer360Input.value!!.toDouble(),

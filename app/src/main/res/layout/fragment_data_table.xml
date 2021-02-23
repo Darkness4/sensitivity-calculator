@@ -28,34 +28,77 @@
             tools:text="CSGO" />
 
         <TextView
-            android:id="@+id/text_view_stats_label"
+            android:id="@+id/text_view_quadratic_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:text="@string/quadratic_regression"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_game" />
+
+        <TextView
+            android:id="@+id/text_view_stats_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:text="@string/stats_label"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_game" />
+            app:layout_constraintTop_toBottomOf="@+id/text_view_quadratic_label" />
 
         <TextView
             android:id="@+id/text_view_stats_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="8dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             app:layout_constraintBottom_toBottomOf="@+id/text_view_stats_label"
             app:layout_constraintStart_toEndOf="@+id/text_view_stats_label"
             app:layout_constraintTop_toTopOf="@+id/text_view_stats_label"
             app:layout_constraintVertical_bias="0.0"
-            app:showOnSuccess="@{viewModel.meanStd}"
+            app:showOnSuccess="@{viewModel.approximation}"
+            tools:text="1.0 + 2.0 * x + 3.0 * x^2" />
+
+        <TextView
+            android:id="@+id/text_view_linear_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/linear_regression"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_stats_label" />
+
+        <TextView
+            android:id="@+id/text_view_factor_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/factor_equal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_linear_label" />
+
+        <TextView
+            android:id="@+id/text_view_factor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            app:layout_constraintBottom_toBottomOf="@+id/text_view_factor_label"
+            app:layout_constraintStart_toEndOf="@+id/text_view_factor_label"
+            app:layout_constraintTop_toTopOf="@+id/text_view_factor_label"
+            app:showOnSuccess="@{viewModel.factor}"
             tools:text="1.0 ± 2.0" />
 
         <View
             android:id="@+id/first_divider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:background="@color/black"
+            android:background="?attr/colorOnBackground"
             app:layout_constraintBottom_toTopOf="@+id/include"
             app:layout_constraintEnd_toEndOf="@+id/include"
             app:layout_constraintStart_toStartOf="@+id/include" />
@@ -70,13 +113,13 @@
             android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_stats_label" />
+            app:layout_constraintTop_toBottomOf="@+id/text_view_factor_label" />
 
         <View
             android:id="@+id/second_divider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:background="@color/black"
+            android:background="?attr/colorOnBackground"
             app:layout_constraintBottom_toTopOf="@+id/recycler_view_data_table"
             app:layout_constraintEnd_toEndOf="@+id/include"
             app:layout_constraintStart_toStartOf="@+id/include"

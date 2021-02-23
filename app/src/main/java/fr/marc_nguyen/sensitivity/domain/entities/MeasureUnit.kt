@@ -2,7 +2,8 @@ package fr.marc_nguyen.sensitivity.domain.entities
 
 enum class MeasureUnit(val symbol: String) {
     INCH("in"),
-    CENTIMETER("cm");
+    CENTIMETER("cm"),
+    NOT_A_NUMBER("NaN");
 
     companion object {
         val symbols = values().map { it.symbol }
@@ -19,6 +20,7 @@ enum class MeasureUnit(val symbol: String) {
 
     infix fun convertTo(unit: MeasureUnit): Double {
         if (this == unit) return 1.0
+        if (this == NOT_A_NUMBER || unit == NOT_A_NUMBER) return 1.0
 
         return conversionTable.getOrElse(this to unit) {
             val ratio = conversionTable.getOrElse(unit to this) {

@@ -1,13 +1,16 @@
 <resources>
     <string name="app_name">Sensitivity Calculator</string>
-    <string name="stats_label">Sens/Dist/360° (Avg ± Std. Dev.):</string>
+    <string name="stats_label">f(dist) -> sens^-1 =</string>
     <string name="sensitivity">Sensitivity</string>
     <string name="distance_per_360">Distance/360°</string>
-    <string name="game">Game</string>
-    <string name="unit">Unit</string>
-    <string name="sensitivity_in_game">Sensitivity In Game</string>
     <string name="target_game">Target Game</string>
+    <string name="unit">Unit</string>
+    <string name="sensitivity_in_source_game">Sensitivity In Source Game</string>
+    <string name="source_game">Source Game</string>
     <string name="add">Add</string>
     <string name="open_data_table">Open data table</string>
-    <string name="sens_dist_360">Sens/Dist/360°</string>
+    <string name="factor">360°/(Sens*Dist)</string>
+    <string name="linear_regression">Linear Regression</string>
+    <string name="quadratic_regression">Quadratic Regression</string>
+    <string name="factor_equal">Factor (360°/(Sens*Dist)) =</string>
 </resources>
