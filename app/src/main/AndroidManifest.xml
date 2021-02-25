@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="fr.marc_nguyen.sensitivity">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
-        android:name="fr.marc_nguyen.sensitivity.AndroidApplication"
+        android:name=".AndroidApplication"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,7 +14,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SensitivityCalculator">
-        <activity android:name="fr.marc_nguyen.sensitivity.presentation.ui.MainActivity">
+        <activity
+            android:name=".presentation.ui.ArActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".presentation.ui.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".presentation.ui.MainActivity" />
+        </activity>
+
+        <meta-data
+            android:name="com.google.ar.core"
+            android:value="optional" />
+
+        <activity android:name=".presentation.ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

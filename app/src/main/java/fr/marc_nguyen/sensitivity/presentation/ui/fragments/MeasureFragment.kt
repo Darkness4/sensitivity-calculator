@@ -1,6 +1,8 @@
 package fr.marc_nguyen.sensitivity.presentation.ui.fragments
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.ar.core.ArCoreApk
 import dagger.hilt.android.AndroidEntryPoint
 import fr.marc_nguyen.sensitivity.core.state.doOnFailure
 import fr.marc_nguyen.sensitivity.core.state.fold
@@ -25,9 +28,11 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MeasureFragment : Fragment() {
     private val viewModel: MeasureViewModel by viewModels()
+
     private var _binding: FragmentMeasureBinding? = null
     private val binding: FragmentMeasureBinding
         get() = _binding!!
+
     private var _gameAdapter: ArrayAdapter<String>? = null
     private val gameAdapter: ArrayAdapter<String>
         get() = _gameAdapter!!
@@ -44,6 +49,10 @@ class MeasureFragment : Fragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
+        /* AR */
+        maybeEnableArButton()
+
+        /* Adapters */
         _gameAdapter =
             ArrayAdapterNoFilter(
                 requireContext(),
@@ -51,7 +60,6 @@ class MeasureFragment : Fragment() {
                 mutableListOf()
             )
         binding.editTextSourceGame.setAdapter(gameAdapter)
-
         refreshGameList()
 
         val unitAdapter = ArrayAdapterNoFilter(
@@ -62,6 +70,24 @@ class MeasureFragment : Fragment() {
         binding.editTextUnit.setAdapter(unitAdapter)
         binding.editTextTargetUnit.setAdapter(unitAdapter)
 
+        /* Navigation */
+        viewModel.goToDataTableFragment.observe(viewLifecycleOwner) {
+            it?.let {
+                this.findNavController()
+                    .navigate(MeasureFragmentDirections.actionMeasureFragmentToDataTableFragment(it.game))
+                viewModel.goToDataTableFragmentDone()
+            }
+        }
+
+        viewModel.goToArActivity.observe(viewLifecycleOwner) {
+            it?.let {
+                this.findNavController()
+                    .navigate(MeasureFragmentDirections.actionMeasureFragmentToArActivity())
+                viewModel.goToArActivityDone()
+            }
+        }
+
+        /* Results */
         viewModel.addResult.observe(viewLifecycleOwner) {
             it?.fold(
                 {
@@ -87,14 +113,7 @@ class MeasureFragment : Fragment() {
             }
         }
 
-        viewModel.goToDataTableFragment.observe(viewLifecycleOwner) {
-            it?.let {
-                this.findNavController()
-                    .navigate(MeasureFragmentDirections.actionMeasureFragmentToDataTableFragment(it.game))
-                viewModel.goToDataTableFragmentDone()
-            }
-        }
-
+        /* Inputs */
         viewModel.sourceGameInput.observe(viewLifecycleOwner) {
             it?.let {
                 viewModel.updateResult()
@@ -115,6 +134,21 @@ class MeasureFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun maybeEnableArButton() {
+        val availability =
+            ArCoreApk.getInstance().checkAvailability(requireContext().applicationContext)
+        if (availability.isTransient) {
+            // Continue to query availability at 5Hz while compatibility is checked in the background.
+            Handler(Looper.getMainLooper()).postDelayed(
+                {
+                    maybeEnableArButton()
+                },
+                200
+            )
+        }
+        viewModel.updateArSupport(availability.isSupported)
     }
 
     private fun refreshGameList() = lifecycleScope.launch {

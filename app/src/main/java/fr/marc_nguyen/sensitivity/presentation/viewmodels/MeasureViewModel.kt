@@ -21,8 +21,10 @@ import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
-class MeasureViewModel @Inject constructor(private val repository: MeasureRepository) :
-    ViewModel() {
+class MeasureViewModel @Inject constructor(
+    private val repository: MeasureRepository
+) : ViewModel() {
+    /* Fields */
     val sourceGameInput = MutableLiveData("CS:GO")
     val sensitivityInput = MutableLiveData("")
     val distancePer360Input = MutableLiveData("")
@@ -30,11 +32,25 @@ class MeasureViewModel @Inject constructor(private val repository: MeasureReposi
     val targetDistancePer360Input = MutableLiveData("")
     val targetUnitInput = MutableLiveData("cm")
 
+    private val _addResult = MutableLiveData<State<Unit>>()
+    val addResult: LiveData<State<Unit>>
+        get() = _addResult
+
     val computeQuadraticResult =
         MutableLiveData<State<String>>(State.Success("Sensitivity: Waiting for input..."))
     val computeLinearResult =
         MutableLiveData<State<String>>(State.Success("Sensitivity: Waiting for input..."))
 
+    /* AR */
+    private val _arIsSupported = MutableLiveData(false)
+    val arIsSupported: LiveData<Boolean>
+        get() = _arIsSupported
+
+    fun updateArSupport(isSupported: Boolean) {
+        _arIsSupported.value = isSupported
+    }
+
+    /* Navigation */
     private val _goToDataTableFragment = MutableLiveData<DataTableFragmentArgs?>()
     val goToDataTableFragment: LiveData<DataTableFragmentArgs?>
         get() = _goToDataTableFragment
@@ -47,9 +63,27 @@ class MeasureViewModel @Inject constructor(private val repository: MeasureReposi
         _goToDataTableFragment.value = null
     }
 
-    private val _addResult = MutableLiveData<State<Unit>>()
-    val addResult: LiveData<State<Unit>>
-        get() = _addResult
+    private val _goToArActivity = MutableLiveData<Unit?>()
+    val goToArActivity: LiveData<Unit?>
+        get() = _goToArActivity
+
+    fun goToArActivity() {
+        _goToArActivity.value = Unit
+    }
+
+    fun goToArActivityDone() {
+        _goToArActivity.value = null
+    }
+
+    /* Actions */
+    fun add() = viewModelScope.launch(Dispatchers.Main) {
+        _addResult.value = try {
+            val measure = toMeasure()
+            repository.createOne(measure).map { }
+        } catch (e: Exception) {
+            State.Failure(e)
+        }
+    }
 
     fun updateResult() {
         computeQuadratic()
@@ -107,15 +141,6 @@ class MeasureViewModel @Inject constructor(private val repository: MeasureReposi
             }
 
             State.Success("Sensitivity: %.4f".format(sensitivity))
-        } catch (e: Exception) {
-            State.Failure(e)
-        }
-    }
-
-    fun add() = viewModelScope.launch(Dispatchers.Main) {
-        _addResult.value = try {
-            val measure = toMeasure()
-            repository.createOne(measure).map { }
         } catch (e: Exception) {
             State.Failure(e)
         }

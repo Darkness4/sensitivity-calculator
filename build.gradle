@@ -5,6 +5,7 @@ buildscript {
         android_gradle_plugin_version = '4.1.2'
         hilt_version = '2.32-alpha'
         nav_version = "2.3.3"
+        gms_version = "4.3.5"
     }
     repositories {
         google()

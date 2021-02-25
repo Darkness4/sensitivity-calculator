@@ -37,7 +37,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/source_game"
-                    android:inputType="none"
+                    android:inputType="text"
                     android:text="@={viewModel.sourceGameInput}" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -236,13 +236,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:onClick="@{() -> viewModel.goToDataTableFragment()}"
                 android:text="@string/open_data_table"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/button_ar"
                 app:layout_constraintTop_toBottomOf="@+id/text_view_linear_result" />
+
+            <Button
+                android:id="@+id/button_ar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:onClick="@{() -> viewModel.goToArActivity()}"
+                android:text="@string/open_ar_label"
+                app:enableIfArSupported="@{viewModel.arIsSupported}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

@@ -22,6 +22,7 @@ class DataTableViewModel @AssistedInject constructor(
     @Assisted val game: String
 ) :
     ViewModel() {
+    /* Fields */
     val measures =
         repository.watchByGame(game)
             .asLiveData(viewModelScope.coroutineContext + Dispatchers.Default)
@@ -51,6 +52,7 @@ class DataTableViewModel @AssistedInject constructor(
         }
     }
 
+    /* Actions */
     fun delete(measure: Measure) = viewModelScope.launch(Dispatchers.Main) {
         repository.deleteOne(measure)
     }

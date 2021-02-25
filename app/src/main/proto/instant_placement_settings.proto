@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+option java_package = "fr.marc_nguyen.sensitivity.data.models";
+option java_multiple_files = true;
+
+message InstantPlacementSettingsModel {
+    bool instant_placement_enabled = 1;
+}

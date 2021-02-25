@@ -13,4 +13,13 @@
     <string name="linear_regression">Linear Regression</string>
     <string name="quadratic_regression">Quadratic Regression</string>
     <string name="factor_equal">Factor (360°/(Sens*Dist)) =</string>
+    <string name="open_ar_label">Open AR</string>
+
+    <!-- OpenGL compatibility dialog -->
+    <string name="opengl_required_title">OpenGL Error</string>
+    <string name="opengl_required_message">OpenGL ES %1$s or later required</string>
+
+    <!-- camera permission dialog -->
+    <string name="camera_permission_title">Camera Permission</string>
+    <string name="camera_permission_message">Camera is used for Augmented Reality</string>
 </resources>
