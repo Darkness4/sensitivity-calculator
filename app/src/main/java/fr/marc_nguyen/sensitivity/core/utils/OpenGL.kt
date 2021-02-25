@@ -45,7 +45,7 @@ fun createEglContext(): EGLContext {
     return if (EGL14.eglMakeCurrent(display, surface, surface, context)) {
         context
     } else {
-        throw  Exception("Error creating EGL Context")
+        throw Exception("Error creating EGL Context")
     }
 }
 

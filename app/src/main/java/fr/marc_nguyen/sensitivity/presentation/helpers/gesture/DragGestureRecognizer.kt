@@ -11,7 +11,7 @@ class DragGestureRecognizer(gesturePointersUtility: GesturePointersUtility) :
         val actionId = motionEvent.getPointerId(motionEvent.actionIndex)
 
         val touchBegan = action == MotionEvent.ACTION_DOWN ||
-                action == MotionEvent.ACTION_POINTER_DOWN
+            action == MotionEvent.ACTION_POINTER_DOWN
 
         if (touchBegan && !gesturePointersUtility.isPointerIdRetained(actionId)) {
             gestures.add(DragGesture(gesturePointersUtility, motionEvent))

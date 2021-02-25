@@ -1,7 +1,7 @@
 package fr.marc_nguyen.sensitivity.presentation.helpers.gesture
 
 import android.view.MotionEvent
-import java.util.*
+import java.util.ArrayList
 
 // A Gesture recognizer processes touch input to determine if a gesture should start and fires an
 // event when the gesture is started.

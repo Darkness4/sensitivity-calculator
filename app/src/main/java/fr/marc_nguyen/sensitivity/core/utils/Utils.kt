@@ -2,14 +2,8 @@ package fr.marc_nguyen.sensitivity.core.utils
 
 import android.Manifest
 import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import fr.marc_nguyen.sensitivity.R
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
 
 data class PermissionResultEvent(val requestCode: Int, val grantResults: IntArray) {
     override fun equals(other: Any?): Boolean {

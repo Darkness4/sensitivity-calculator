@@ -120,8 +120,10 @@ class ArCore(private val activity: Activity, val filament: Filament, private val
         DisplayMetrics()
             .also { displayMetrics ->
                 @Suppress("DEPRECATION")
-                (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) activity.display
-                else activity.windowManager.defaultDisplay)!!
+                (
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) activity.display
+                    else activity.windowManager.defaultDisplay
+                    )!!
                     .also { display ->
                         display.getRealMetrics(displayMetrics)
                         displayRotation = display.rotation
@@ -144,9 +146,11 @@ class ArCore(private val activity: Activity, val filament: Filament, private val
         val cameraWidth: Int
         val cameraHeight: Int
 
-        when (cameraManager
-            .getCameraCharacteristics(cameraId)
-            .get(CameraCharacteristics.SENSOR_ORIENTATION)!!) {
+        when (
+            cameraManager
+                .getCameraCharacteristics(cameraId)
+                .get(CameraCharacteristics.SENSOR_ORIENTATION)!!
+        ) {
             0, 180 -> when (displayRotation) {
                 Surface.ROTATION_0, Surface.ROTATION_180 -> {
                     cameraWidth = dimensions[0]
@@ -407,7 +411,7 @@ class ArCore(private val activity: Activity, val filament: Filament, private val
                         TextureSampler.MagFilter.LINEAR,
                         TextureSampler.WrapMode.CLAMP_TO_EDGE,
                     ),
-                    //.also { it.anisotropy = 8.0f }
+                    // .also { it.anisotropy = 8.0f }
                 )
 
                 materialInstance.setParameter(
@@ -421,7 +425,7 @@ class ArCore(private val activity: Activity, val filament: Filament, private val
                         .levels(1)
                         .build(filament.engine)
                         .also { depthTexture = it },
-                    TextureSampler(), //.also { it.anisotropy = 8.0f }
+                    TextureSampler(), // .also { it.anisotropy = 8.0f }
                 )
 
                 materialInstance.setParameter(
@@ -536,14 +540,16 @@ class ArCore(private val activity: Activity, val filament: Filament, private val
         .rotate(imageRotation().toFloat(), 0f, 0f, -1f)
         .translate(-.5f, -.5f, 0f)
 
-    private fun imageRotation(): Int = (cameraManager
-        .getCameraCharacteristics(cameraId)
-        .get(CameraCharacteristics.SENSOR_ORIENTATION)!! +
-        when (displayRotationDegrees) {
-            0 -> 90
-            90 -> 0
-            180 -> 270
-            270 -> 180
-            else -> throw Exception()
-        } + 270) % 360
+    private fun imageRotation(): Int = (
+        cameraManager
+            .getCameraCharacteristics(cameraId)
+            .get(CameraCharacteristics.SENSOR_ORIENTATION)!! +
+            when (displayRotationDegrees) {
+                0 -> 90
+                90 -> 0
+                180 -> 270
+                270 -> 180
+                else -> throw Exception()
+            } + 270
+        ) % 360
 }

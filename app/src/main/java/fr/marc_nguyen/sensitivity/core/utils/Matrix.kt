@@ -105,8 +105,10 @@ fun Frame.projectionMatrix(): M4 = FloatArray(16)
 
 @Suppress("DEPRECATION")
 fun Activity.displayRotation(): Int =
-    (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) display
-    else windowManager.defaultDisplay)!!.rotation
+    (
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) display
+        else windowManager.defaultDisplay
+        )!!.rotation
 
 @Suppress("DEPRECATION")
 fun Activity.displayRotationDegrees(): Int =

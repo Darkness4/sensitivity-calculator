@@ -32,8 +32,8 @@ class DragGesture(gesturePointersUtility: GesturePointersUtility, motionEvent: M
             return false
         }
 
-        if (actionId == pointerId
-            && (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP)
+        if (actionId == pointerId &&
+            (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP)
         ) {
             cancel()
             return false
@@ -82,8 +82,8 @@ class DragGesture(gesturePointersUtility: GesturePointersUtility, motionEvent: M
                 position = newPosition
                 return true
             }
-        } else if (actionId == pointerId
-            && (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP)
+        } else if (actionId == pointerId &&
+            (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP)
         ) {
             complete()
         } else if (action == MotionEvent.ACTION_CANCEL) {

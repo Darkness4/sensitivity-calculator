@@ -22,9 +22,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,15 +35,17 @@ class ModelRenderer(
     private val context: Context,
     private val arCore: ArCore,
     private val filament: Filament,
-    initialPos: ModelEvent.Move,
     private val initialModel: ModelResource
 ) {
 
     val modelEvents: MutableSharedFlow<ModelEvent> =
         MutableSharedFlow(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
-    val doFrameEvents: MutableSharedFlow<Frame> =
+    private val doFrameEvents: MutableSharedFlow<Frame> =
         MutableSharedFlow(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    private val canDrawBehavior: MutableStateFlow<Unit?> =
+        MutableStateFlow(null)
 
     private var translation: V3 = v3Origin
     private var rotate: Float = 0f
@@ -52,13 +55,6 @@ class ModelRenderer(
         CoroutineScope(Dispatchers.Main)
 
     private var filamentAsset: FilamentAsset? = null
-
-    fun renderModel(resource: ModelResource) {
-        destroyAssets()
-        coroutineScope.launch {
-            filamentAsset = load3DModel(resource)
-        }
-    }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun load3DModel(resource: ModelResource) = withContext(Dispatchers.IO) {
@@ -75,20 +71,10 @@ class ModelRenderer(
     }
 
     init {
-        arCore.frame
-            .hitTest(initialPos.x, initialPos.y)
-            .maxByOrNull {
-                it.trackable is Point
-            }?.let {
-                V3(it.hitPose.translation)
-            }?.let {
-                translation = it
-            }
-
         coroutineScope.launch {
-
             filamentAsset = load3DModel(initialModel)
 
+            // Translation
             launch {
                 modelEvents.mapNotNull { modelEvent ->
                     (modelEvent as? ModelEvent.Move)
@@ -103,10 +89,12 @@ class ModelRenderer(
                             V3(it.hitPose.translation)
                         }
                 }.collect {
+                    canDrawBehavior.tryEmit(Unit)
                     translation = it
                 }
             }
 
+            // Rotate and scale
             launch {
                 modelEvents.collect { modelEvent ->
                     when (modelEvent) {
@@ -122,18 +110,16 @@ class ModelRenderer(
             }
 
             launch {
-                doFrameEvents.filter {
-                    filamentAsset != null
-                }.map {
-                    filamentAsset!!
-                }.collect { asset ->
-                    val entity = filament.engine.transformManager.getInstance(asset.root)
+                canDrawBehavior.filterNotNull().first()
+
+                doFrameEvents.collect {
+                    val entity = filament.engine.transformManager.getInstance(filamentAsset!!.root)
                     val localTransform = m4Identity()
                         .translate(translation.x, translation.y, translation.z)
                         .rotate(rotate.toDegrees, 0f, 1f, 0f)
                         .scale(scale, scale, scale)
                         .floatArray
-                    filament.scene.addEntities(asset.entities)
+                    filament.scene.addEntities(filamentAsset!!.entities)
                     filament.engine.transformManager.setTransform(entity, localTransform)
                 }
             }
@@ -151,5 +137,9 @@ class ModelRenderer(
             filament.assetLoader.destroyAsset(filamentAsset!!)
             filamentAsset = null
         }
+    }
+
+    fun doFrame(frame: Frame) {
+        doFrameEvents.tryEmit(frame)
     }
 }

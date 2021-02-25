@@ -37,7 +37,7 @@ class FrameCallback(
         lastTick = tick
 
         // render using frame from last tick to reduce possibility of jitter but increases latency
-        if (// only render if we have an ar frame
+        if ( // only render if we have an ar frame
             arCore.timestamp != 0L &&
             arCore.filament.uiHelper.isReadyToRender &&
             // This means you are sending frames too quickly to the GPU
