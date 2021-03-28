@@ -119,7 +119,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
 
     // Lifecycle
-    def lifecycle_version = '2.3.0'
+    def lifecycle_version = '2.3.1'
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
@@ -133,10 +133,10 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'androidx.recyclerview:recyclerview:1.2.0-beta02'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0-rc01'
 
     // Fragment
-    implementation "androidx.fragment:fragment-ktx:1.3.0"
+    implementation "androidx.fragment:fragment-ktx:1.3.2"
 
     // Logging
     implementation 'com.jakewharton.timber:timber:4.7.1'
