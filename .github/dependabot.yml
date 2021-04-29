@@ -1,0 +1,34 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  reviewers:
+  - Darkness4
+  assignees:
+  - Darkness4
+  ignore:
+  - dependency-name: androidx.room:room-compiler
+    versions:
+    - ">= 2.4.a, < 2.5"
+  - dependency-name: androidx.room:room-ktx
+    versions:
+    - ">= 2.4.a, < 2.5"
+  - dependency-name: androidx.room:room-runtime
+    versions:
+    - ">= 2.4.a, < 2.5"
+  - dependency-name: androidx.fragment:fragment-ktx
+    versions:
+    - 1.3.1
+  - dependency-name: org.jetbrains.kotlinx:kotlinx-coroutines-test
+    versions:
+    - 1.4.2-native-mt
+  - dependency-name: org.jetbrains.kotlinx:kotlinx-coroutines-android
+    versions:
+    - 1.4.2-native-mt
+  - dependency-name: org.jetbrains.kotlinx:kotlinx-coroutines-core
+    versions:
+    - 1.4.2-native-mt
